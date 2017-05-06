@@ -1,5 +1,6 @@
-from django.http import HttpResponse
+from django.shortcuts import render
 
 
 def index(request):
-    return HttpResponse('Hello world. Welcome to wordplease project')
+    return render(request, 'blogs/latest_posts.html')
+
