@@ -13,9 +13,9 @@
         {% endif %}
     </h1>
     <h2>{% trans "Blogs list" %}</h2>
-    {% if blog_list %}
+    {% if object_list %}
         <ul>
-        {% for blog in blog_list %}
+        {% for blog in object_list %}
             <li>
                 {{ blog.name }} - {{ blog.num_posts }} posts
                 <p>{{ blog.description }}</p>

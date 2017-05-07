@@ -13,9 +13,9 @@
         {% endif %}
     </h1>
     <h2>{% trans "Posts by " %}</h2>
-    {% if posts %}
+    {% if object_list %}
         <ul>
-        {% for post in posts %}
+        {% for post in object_list %}
             <li>
                 {{ post.title }}
                 {% if post.image_url %}
