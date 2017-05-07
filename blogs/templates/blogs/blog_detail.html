@@ -13,18 +13,6 @@
         {% endif %}
     </h1>
     <h2>{% trans "Posts by " %}</h2>
-    {% if object_list %}
-        <ul>
-        {% for post in object_list %}
-            <li>
-                {{ post.title }}
-                {% if post.image_url %}
-                    <img src="{{ post.image_url }}" alt="{{ post.title }}">
-                {% endif %}
-                <p>{{ post.intro }}</p>
-            </li>
-        {% endfor %}
-        </ul>
-    {% endif %}
+    {% include "blogs/includes/post_list.html" %}
 </body>
 </html>
