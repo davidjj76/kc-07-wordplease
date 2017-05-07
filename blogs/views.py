@@ -14,3 +14,12 @@ class BlogList(ListView):
 
     model = Blog
     template_name = 'blogs/blog_list.html'
+
+
+class BlogDetail(PostList, ListView):
+
+    template_name = 'blogs/blog_detail.html'
+    context_object_name = 'posts'
+
+    def get_queryset(self):
+        return super().queryset.filter(blog__owner__username=self.kwargs.get('username'))

@@ -1,0 +1,30 @@
+{% load i18n %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Wordplease</title>
+</head>
+<body>
+    <h1>
+        {% trans "Welcome to wordplease" %}
+        {% if user.is_authenticated %}
+            ({{ user.username }})
+        {% endif %}
+    </h1>
+    <h2>{% trans "Posts by " %}</h2>
+    {% if posts %}
+        <ul>
+        {% for post in posts %}
+            <li>
+                {{ post.title }}
+                {% if post.image_url %}
+                    <img src="{{ post.image_url }}" alt="{{ post.title }}">
+                {% endif %}
+                <p>{{ post.intro }}</p>
+            </li>
+        {% endfor %}
+        </ul>
+    {% endif %}
+</body>
+</html>
