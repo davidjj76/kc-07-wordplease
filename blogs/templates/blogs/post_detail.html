@@ -13,5 +13,17 @@
         {% endif %}
     </h1>
     <h2>{{ object.title }}</h2>
+    {% if object.image_url %}
+        <img src="{{ object.image_url }}" alt="{{ object.title }}">
+    {% endif %}
+    <div>
+        {% trans "Published in" %}
+        {{ object.categories.all|join:", " }}
+        {% trans "on" %}
+        {{ object.publish_date }}
+    </div>
+    <div>
+        {{ object.body|safe }}
+    </div>
 </body>
 </html>

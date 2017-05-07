@@ -1,7 +1,6 @@
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone
-from django.utils.datetime_safe import datetime
 
 
 class Category(models.Model):
@@ -32,7 +31,7 @@ class Blog(models.Model):
 class PostManager(models.Manager):
 
     def published(self):
-        return Post.objects.filter(publish_date__lte=datetime.now())
+        return Post.objects.filter(publish_date__lte=timezone.now())
 
 
 class Post(models.Model):

@@ -12,7 +12,7 @@
             ({{ user.username }})
         {% endif %}
     </h1>
-    <h2>{% trans "Posts by " %}</h2>
+    <h2>{{ blog.name }}</h2>
     {% include "blogs/includes/post_list.html" %}
 </body>
 </html>
