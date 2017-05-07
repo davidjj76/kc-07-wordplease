@@ -1,0 +1,17 @@
+{% load i18n %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Wordplease</title>
+</head>
+<body>
+    <h1>
+        {% trans "Welcome to wordplease" %}
+        {% if user.is_authenticated %}
+            ({{ user.username }})
+        {% endif %}
+    </h1>
+    <h2>{{ object.title }}</h2>
+</body>
+</html>

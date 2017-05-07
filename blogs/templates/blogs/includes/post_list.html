@@ -1,6 +1,6 @@
 {% load i18n %}
 {% for post in object_list %}
-    <a href="">
+    <a href="{% url 'post_detail' post.blog.owner.username post.pk %}">
         <div>
             {% if post.image_url %}
                 <div>
