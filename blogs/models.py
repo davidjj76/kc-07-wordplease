@@ -33,5 +33,8 @@ class Post(models.Model):
     publish_date = models.DateTimeField(default=timezone.now)
     categories = models.ManyToManyField(Category, related_name='posts')
 
+    class Meta:
+        ordering = ['-publish_date']
+
     def __str__(self):
         return self.title

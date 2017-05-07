@@ -7,5 +7,21 @@
 </head>
 <body>
     <h1>{% trans "Welcome to wordplease" %}</h1>
+    <h2>{% trans "Latest posts" %}</h2>
+    {% if latest_posts %}
+        <ul>
+        {% for post in latest_posts %}
+            <li>
+                {{ post.title }}
+                {% if post.image_url %}
+                    <img src="{{ post.image_url }}" alt="{{ post.title }}">
+                {% endif %}
+                <p>{{ post.intro }}</p>
+            </li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>{% trans "Be the first one..." %}</p>
+    {% endif %}
 </body>
 </html>
