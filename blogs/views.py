@@ -1,11 +1,10 @@
-from django.shortcuts import render
+from django.views.generic import ListView
 
 from blogs.models import Post
 
 
-def index(request):
-    latest_posts = Post.objects.all()
-    context = {
-        'latest_posts': latest_posts
-    }
-    return render(request, 'blogs/latest_posts.html', context)
+class PostList(ListView):
+
+    template_name = 'blogs/latest_posts.html'
+    context_object_name = 'latest_posts'
+    queryset = Post.objects.published()

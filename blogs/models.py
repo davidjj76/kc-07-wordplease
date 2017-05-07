@@ -1,6 +1,7 @@
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone
+from django.utils.datetime_safe import datetime
 
 
 class Category(models.Model):
@@ -13,6 +14,7 @@ class Category(models.Model):
     def __str__(self):
         return self.name
 
+
 class Blog(models.Model):
 
     owner = models.OneToOneField(User,related_name='blog')
@@ -23,6 +25,13 @@ class Blog(models.Model):
     def __str__(self):
         return self.name
 
+
+class PostManager(models.Manager):
+
+    def published(self):
+        return Post.objects.filter(publish_date__lte=datetime.now())
+
+
 class Post(models.Model):
 
     blog = models.ForeignKey(Blog, related_name='posts')
@@ -32,6 +41,7 @@ class Post(models.Model):
     image_url = models.URLField(blank=True, null=True)
     publish_date = models.DateTimeField(default=timezone.now)
     categories = models.ManyToManyField(Category, related_name='posts')
+    objects = PostManager()
 
     class Meta:
         ordering = ['-publish_date']
