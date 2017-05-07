@@ -1,3 +1,4 @@
+from django.db.models import Count
 from django.views.generic import ListView
 
 from blogs.models import Post, Blog
@@ -14,6 +15,7 @@ class BlogList(ListView):
 
     model = Blog
     template_name = 'blogs/blog_list.html'
+    queryset = Blog.objects.annotate(num_posts=Count('posts'))
 
 
 class BlogDetail(PostList, ListView):

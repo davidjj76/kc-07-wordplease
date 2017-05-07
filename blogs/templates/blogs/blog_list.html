@@ -17,7 +17,7 @@
         <ul>
         {% for blog in blog_list %}
             <li>
-                {{ blog.name }}
+                {{ blog.name }} - {{ blog.num_posts }} posts
                 <p>{{ blog.description }}</p>
             </li>
         {% endfor %}
