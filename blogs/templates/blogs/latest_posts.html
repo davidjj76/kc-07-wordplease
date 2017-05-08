@@ -1,18 +1,15 @@
+{% extends 'base.html' %}
 {% load i18n %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Wordplease</title>
-</head>
-<body>
-    <h1>
-        {% trans "Welcome to wordplease" %}
-        {% if user.is_authenticated %}
-            ({{ user.username }})
-        {% endif %}
-    </h1>
-    <h2>{% trans "Latest published posts" %}</h2>
+{% block section %}
+    <div class="page-header">
+      <h1>
+          {% trans "Latest posts" %}
+          <small>
+              {% blocktrans with count=object_list|length %}
+                  ({{ count }} and counting)
+              {% endblocktrans %}
+          </small>
+      </h1>
+    </div>
     {% include "blogs/includes/post_list.html" %}
-</body>
-</html>
+{% endblock %}

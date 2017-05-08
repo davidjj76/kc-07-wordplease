@@ -1,29 +1,20 @@
+{% extends 'base.html' %}
 {% load i18n %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Wordplease</title>
-</head>
-<body>
-    <h1>
-        {% trans "Welcome to wordplease" %}
-        {% if user.is_authenticated %}
-            ({{ user.username }})
-        {% endif %}
-    </h1>
-    <h2>{{ object.title }}</h2>
+{% load l10n %}
+{% block section %}
+    {% include "blogs/includes/blog_header.html" %}
+    <h1>{{ object.title }}</h1>
     {% if object.image_url %}
-        <img src="{{ object.image_url }}" alt="{{ object.title }}">
+        <img class="thumbnail img-responsive" src="{{ object.image_url }}" alt="{{ object.title }}">
     {% endif %}
-    <div>
+    <div class="well well-sm">
         {% trans "Published in" %}
         {{ object.categories.all|join:", " }}
         {% trans "on" %}
-        {{ object.publish_date }}
+        {{ object.publish_date|localize }}
     </div>
     <div>
         {{ object.body|safe }}
     </div>
-</body>
-</html>
+{% endblock %}
+

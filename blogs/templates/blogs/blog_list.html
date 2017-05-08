@@ -1,29 +1,43 @@
+{% extends 'base.html' %}
 {% load i18n %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Wordplease</title>
-</head>
-<body>
-    <h1>
-        {% trans "Welcome to wordplease" %}
-        {% if user.is_authenticated %}
-            ({{ user.username }})
-        {% endif %}
-    </h1>
-    <h2>{% trans "Blogs list" %}</h2>
-    {% if object_list %}
-        <ul>
+{% block section %}
+    <div class="page-header">
+      <h1>
+          {% trans "Wordplease's blogs" %}
+          <small>
+              {% blocktrans with count=object_list|length %}
+                  ({{ count }} and counting)
+              {% endblocktrans %}
+          </small>
+      </h1>
+    </div>
+    <div class="row">
         {% for blog in object_list %}
-            <li>
-                {{ blog.name }} - {{ blog.num_posts }} posts
-                <p>{{ blog.description }}</p>
-            </li>
+            <div class="col-xs-12">
+                <a href="{% url 'blog_detail' blog.owner.username %}">
+                    <div class="panel panel-default wow fadeIn" data-wow-delay="{{ forloop.counter }}00ms">
+                        <div class="panel-heading">
+                            <h2 class="panel-title">
+                                {{ blog.name }}
+                                <span class="badge">{{ blog.num_posts }} posts</span>
+                            </h2>
+                        </div>
+                        <div class="panel-body">
+                            {{ blog.description }}
+                        </div>
+                        <div class="panel-footer">
+                            by {{ blog.owner.first_name }} {{ blog.owner.last_name }}
+                        </div>
+                    </div>
+                </a>
+            </div>
+        {% empty %}
+            <div class="jumbotron wow bounceIn">
+                <h1>{% trans "No blogs here" %}</h1>
+                <p>{% trans "We are sorry, but nobody has a blog here." %}</p>
+            </div>
         {% endfor %}
-        </ul>
-    {% else %}
-        <p>{% trans "Be the first one..." %}</p>
-    {% endif %}
-</body>
-</html>
+    </div>
+    {# {% include 'blogs/includes/paginator.html' %} #}
+{% endblock %}
+
