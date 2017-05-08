@@ -14,9 +14,9 @@ class PostQuerySet:
 class BlogContextData:
 
     @staticmethod
-    def get_by_username(username):
+    def get_by_username(username, get_categories):
         return {
-            'categories': Category.objects.all(),
+            'categories': Category.objects.all() if get_categories else None,
             'username': username,
             'blog': get_object_or_404(Blog, owner__username=username)
         }
@@ -46,7 +46,7 @@ class BlogDetail(PostQuerySet, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update(
-            BlogContextData.get_by_username(self.kwargs.get('username'))
+            BlogContextData.get_by_username(self.kwargs.get('username'), True)
         )
         return context
 
