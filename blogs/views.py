@@ -18,11 +18,16 @@ class PostQuerySet:
 class BlogContextData:
 
     @staticmethod
-    def get_by_username(username):
+    def get_blog(username):
         return {
-            'categories': Category.objects.all(),
             'username': username,
             'blog': get_object_or_404(Blog, owner__username=username)
+        }
+
+    @staticmethod
+    def get_categories():
+        return {
+            'categories': Category.objects.all(),
         }
 
 
@@ -50,7 +55,10 @@ class BlogDetail(PostQuerySet, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update(
-            BlogContextData.get_by_username(self.kwargs.get('username'))
+            BlogContextData.get_blog(self.kwargs.get('username'))
+        )
+        context.update(
+            BlogContextData.get_categories()
         )
         return context
 
@@ -65,7 +73,7 @@ class PostDetail(PostQuerySet, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update(
-            BlogContextData.get_by_username(self.kwargs.get('username'))
+            BlogContextData.get_blog(self.kwargs.get('username'))
         )
         return context
 
