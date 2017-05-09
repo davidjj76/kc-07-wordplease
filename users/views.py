@@ -1,6 +1,6 @@
 from django.contrib.auth.views import LoginView as DjangoLoginView, LogoutView as DjangoLogoutView
-from django.urls import reverse
-from django.views.generic import FormView
+from django.urls import reverse, reverse_lazy
+from django.views.generic import FormView, TemplateView
 
 from users.forms import UserForm
 
@@ -9,13 +9,16 @@ class SignupView(FormView):
 
     template_name = 'users/signup.html'
     form_class = UserForm
-
-    def get_success_url(self):
-        return reverse('latest_posts')
+    success_url = reverse_lazy('users_signup_successful')
 
     def form_valid(self, form):
         form.save()
         return super().form_valid(form)
+
+
+class SignupSuccessfulView(TemplateView):
+
+    template_name = 'users/signup_successful.html'
 
 
 class LoginView(DjangoLoginView):
