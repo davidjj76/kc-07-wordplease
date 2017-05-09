@@ -32,12 +32,14 @@
                 <ul class="nav navbar-nav navbar-right">
                     {% if user.is_authenticated %}
                         {# <li><a href="{% url 'new_post' %}">{% trans "New Post" %}</a></li> #}
-                        <li><a href="{% url 'blog_detail' user.username %}">{% trans "My blog" %}</a></li>
+                        {% if user.blog %}
+                            <li><a href="{% url 'blog_detail' user.username %}">{% trans "My blog" %}</a></li>
+                        {% endif %}
                         {# <li><a href="{% url 'users_profile' %}">{% trans "My profile" %}</a></li> #}
-                        {# <li><a href="{% url 'users_logout' %}">{% trans "Logout" %}</a></li> #}
+                        <li><a href="{% url 'users_logout' %}">{% trans "Logout" %} ({{ user.username }})</a></li>
                     {% else %}
                         <li><a href="{% url 'users_signup' %}">{% trans "Signup" %}</a></li>
-                        {# <li><a href="{% url 'users_login' %}">{% trans "Login" %}</a></li> #}
+                        <li><a href="{% url 'users_login' %}">{% trans "Login" %}</a></li>
                     {% endif %}
                 </ul>
             </div>
