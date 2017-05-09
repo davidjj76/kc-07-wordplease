@@ -4,6 +4,7 @@ from django.shortcuts import get_object_or_404
 from django.urls import reverse, reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView
 
+from blogs.filters import PostFilter
 from blogs.forms import PostForm
 from blogs.models import Post, Blog, Category
 
@@ -11,7 +12,7 @@ from blogs.models import Post, Blog, Category
 class PostQuerySet:
 
     def get_queryset(self):
-        return Post.objects.published().select_related('blog__owner')
+        return PostFilter(self.request.GET, queryset=Post.objects.published()).qs.select_related('blog__owner')
 
 
 class BlogContextData:

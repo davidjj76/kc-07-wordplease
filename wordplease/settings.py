@@ -40,7 +40,8 @@ INSTALLED_APPS = [
     'wordplease',
     'blogs.apps.BlogsConfig',
     'users.apps.UsersConfig',
-    'django_extensions'
+    'django_extensions',
+    'django_filters',
 ]
 
 MIDDLEWARE = [
