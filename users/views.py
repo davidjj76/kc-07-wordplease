@@ -1,21 +1,17 @@
-from django.shortcuts import render, redirect
 from django.urls import reverse
-from django.views import View
+from django.views.generic import FormView
 
 from users.forms import UserForm
 
 
-class SignupView(View):
+class SignupView(FormView):
 
     template_name = 'users/signup.html'
+    form_class = UserForm
 
-    def get(self, request):
-        return render(request, self.template_name, { 'form': UserForm() })
+    def get_success_url(self):
+        return reverse('latest_posts')
 
-    def post(self, request):
-        form = UserForm(data=request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect(reverse('latest_posts'))
-
-        return render(request, self.template_name, { 'form': form })
+    def form_valid(self, form):
+        form.save()
+        return super().form_valid(form)
