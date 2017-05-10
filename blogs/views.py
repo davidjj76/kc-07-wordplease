@@ -1,4 +1,4 @@
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.db.models import Count
 from django.shortcuts import get_object_or_404
 from django.urls import reverse, reverse_lazy
@@ -78,12 +78,18 @@ class PostDetail(PostQuerySet, DetailView):
         return context
 
 
-class NewPost(LoginRequiredMixin, CreateView):
+class NewPost(LoginRequiredMixin, UserPassesTestMixin, CreateView):
 
     model = Post
     form_class = PostForm
     template_name = 'blogs/new_post.html'
-    login_url = reverse_lazy('users_login')
+
+    def test_func(self):
+        # para poder publicar un post, además de logado, el usuario debe de tener blog
+        try:
+            return self.request.user.blog
+        except Blog.DoesNotExist:
+            return False
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
@@ -97,3 +103,9 @@ class NewPost(LoginRequiredMixin, CreateView):
             'username': post.blog.owner.username,
             'pk': post.pk,
         })
+
+    def get_login_url(self):
+        if self.request.user.is_authenticated:
+            return reverse('users_profile')
+        else:
+            return reverse('users_login')

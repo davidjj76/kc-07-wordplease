@@ -48,7 +48,7 @@ class SignupProfileView(View):
             blog.name = form.cleaned_data.get('blog_name')
             blog.description = form.cleaned_data.get('blog_description')
             blog.save()
-            return redirect(self.get_success_url())
+            return redirect(self.request.GET.get('next', self.get_success_url()))
         else:
             return render(request, self.template_name, {'form': form})
 
@@ -74,20 +74,28 @@ class ProfileView(LoginRequiredMixin, SignupProfileView):
     login_url = reverse_lazy('users_login')
 
     def get_form_initial_data(self, request):
+        try:
+            blog = request.user.blog
+        except Blog.DoesNotExist:
+            blog = None
+
         return {
             'first_name': request.user.first_name,
             'last_name': request.user.last_name,
             'email': request.user.email,
             'username': request.user.username,
-            'blog_name': request.user.blog.name,
-            'blog_description': request.user.blog.description
+            'blog_name': blog.name if blog else '',
+            'blog_description': blog.description if blog else ''
         }
 
     def get_user_object(self):
         return self.request.user
 
     def get_blog_object(self, user):
-        return user.blog
+        try:
+            return user.blog
+        except Blog.DoesNotExist:
+            return super().get_blog_object(user)
 
     def get_success_url(self):
         return 'users_profile_updated'
