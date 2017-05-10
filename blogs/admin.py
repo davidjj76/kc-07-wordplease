@@ -5,7 +5,7 @@ from django.contrib import admin
 
 @admin.register(Post)
 class PostAdmin(admin.ModelAdmin):
-    fields = ('title', 'image_url', 'intro', 'body', ('publish_date', 'blog'), 'categories')
+    fields = ('title', 'image', 'intro', 'body', ('publish_date', 'blog'), 'categories')
     filter_horizontal = ('categories',)
     date_hierarchy = 'publish_date'
     search_fields = ('title', 'intro', 'body', 'blog__name')

@@ -11,7 +11,7 @@ class PostForm(ModelForm):
             'title',
             'intro',
             'body',
-            'image_url',
+            'image',
             'publish_date',
             'categories',
         )

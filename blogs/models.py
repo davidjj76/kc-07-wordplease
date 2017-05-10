@@ -2,6 +2,8 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone
 
+from wordplease import settings
+
 
 class Category(models.Model):
 
@@ -40,7 +42,7 @@ class Post(models.Model):
     title = models.CharField(max_length=250)
     intro = models.TextField(max_length=250)
     body = models.TextField()
-    image_url = models.URLField(blank=True, null=True)
+    image = models.ImageField(blank=True, null=True, upload_to='blogs/images')
     publish_date = models.DateTimeField(default=timezone.now)
     categories = models.ManyToManyField(Category, related_name='posts')
     objects = PostManager()
