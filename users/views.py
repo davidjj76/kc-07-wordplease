@@ -1,8 +1,9 @@
 from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.contrib.auth.views import LoginView as DjangoLoginView, LogoutView as DjangoLogoutView
 from django.shortcuts import render, redirect
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.views import View
 from django.views.generic import TemplateView
 from blogs.models import Blog
@@ -67,9 +68,10 @@ class SignupSuccessfulView(TemplateView):
     template_name = 'users/signup_successful.html'
 
 
-class ProfileView(SignupProfileView):
+class ProfileView(LoginRequiredMixin, SignupProfileView):
 
     template_name = 'users/profile.html'
+    login_url = reverse_lazy('users_login')
 
     def get_form_initial_data(self, request):
         return {
@@ -89,7 +91,6 @@ class ProfileView(SignupProfileView):
 
     def get_success_url(self):
         return 'users_profile_updated'
-
 
 
 class ProfileUpdatedView(TemplateView):
