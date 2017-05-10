@@ -5,8 +5,6 @@ from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
 from django.utils.translation import ugettext as _
 
-from blogs.models import Blog
-
 
 class UserForm(UserCreationForm):
 
@@ -38,7 +36,7 @@ class UserForm(UserCreationForm):
     def clean_username(self):
         username = self.cleaned_data.get('username')
         existent_users = User.objects.filter(username=username)
-        if len(existent_users) > 0:
+        if len(existent_users) > 0 and self.instance not in existent_users:
             raise ValidationError(
                 self.error_messages['username_exists'],
                 code='username_exists',
@@ -48,23 +46,10 @@ class UserForm(UserCreationForm):
     def clean_email(self):
         email = self.cleaned_data.get('email')
         existent_users = User.objects.filter(email=email)
-        if len(existent_users) > 0:
+        if len(existent_users) > 0 and self.instance not in existent_users:
             raise ValidationError(
                 self.error_messages['email_exists'],
                 code='email_exists',
             )
         return email.lower()
 
-    def save(self, commit=True):
-        user = super().save(commit=False)
-        user.first_name = self.cleaned_data.get('first_name')
-        user.last_name = self.cleaned_data.get('last_name')
-        user.email = self.cleaned_data.get('email')
-        user.save()
-
-        blog = Blog(owner=user)
-        blog.name = self.cleaned_data.get('blog_name')
-        blog.description = self.cleaned_data.get('blog_description')
-        blog.save()
-
-        return user
