@@ -1,8 +1,12 @@
+import sys
 from django.contrib.auth.models import User
 from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 from django.utils import timezone
 
 from wordplease import settings
+from .tasks import resize_thumbnails_update_post_image
 
 
 class Category(models.Model):
@@ -45,6 +49,8 @@ class Post(models.Model):
     image = models.ImageField(blank=True, null=True, upload_to='blogs/images')
     publish_date = models.DateTimeField(default=timezone.now)
     categories = models.ManyToManyField(Category, related_name='posts')
+    created_at = models.DateTimeField(auto_now_add=True)
+    modified_at = models.DateTimeField(auto_now=True)
     objects = PostManager()
 
     class Meta:
@@ -52,3 +58,29 @@ class Post(models.Model):
 
     def __str__(self):
         return self.title
+
+    def get_image_extension(self):
+        return self.image.name.split('.')[-1]
+
+    def get_image_name(self):
+        return ''.join((self.image.name.split('/')[-1]).split('.')[0:-1])
+
+    @staticmethod
+    def get_folder(path):
+        return '/'.join((path.split('/'))[0:-1])
+
+    def get_absolute_image_folder(self):
+        return Post.get_folder(self.image.path)
+
+    def get_relative_image_folder(self):
+        return Post.get_folder(self.image.name)
+
+
+if settings.USE_CELERY and 'test' not in sys.argv and 'migrate' not in sys.argv:
+
+    @receiver(post_save, sender=Post)
+    def my_callback(sender, **kwargs):
+        post = kwargs.get('instance')
+        created = kwargs.get('created')
+        if post and post.image and created:
+            resize_thumbnails_update_post_image.delay(post.pk)
