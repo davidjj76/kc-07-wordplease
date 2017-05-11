@@ -1,4 +1,6 @@
 import sys
+
+import re
 from django.contrib.auth.models import User
 from django.db import models
 from django.db.models.signals import post_save
@@ -6,7 +8,7 @@ from django.dispatch import receiver
 from django.utils import timezone
 
 from wordplease import settings
-from .tasks import resize_thumbnails_update_post_image
+from .tasks import resize_thumbnails_update_post_image, generate_mentions_from_post, send_mail_from_post_to_user
 
 
 class Category(models.Model):
@@ -49,6 +51,13 @@ class Post(models.Model):
     image = models.ImageField(blank=True, null=True, upload_to='blogs/images')
     publish_date = models.DateTimeField(default=timezone.now)
     categories = models.ManyToManyField(Category, related_name='posts')
+    mentions = models.ManyToManyField(
+        User,
+        related_name='mentions',
+        null=True,
+        through='Post_Mentions',
+        through_fields=('post', 'user')
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     modified_at = models.DateTimeField(auto_now=True)
     objects = PostManager()
@@ -75,12 +84,34 @@ class Post(models.Model):
     def get_relative_image_folder(self):
         return Post.get_folder(self.image.name)
 
+    def get_mentions(self):
+        return list(set(re.compile(r'@\w+').findall(self.body)))
+
+
+class Post_Mentions(models.Model):
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    mail_sent_at = models.DateTimeField(null=True)
+
 
 if settings.USE_CELERY and 'test' not in sys.argv and 'migrate' not in sys.argv:
 
     @receiver(post_save, sender=Post)
-    def my_callback(sender, **kwargs):
+    def post_saved(sender, **kwargs):
         post = kwargs.get('instance')
         created = kwargs.get('created')
-        if post and post.image and created:
-            resize_thumbnails_update_post_image.delay(post.pk)
+
+        if post and created:
+            generate_mentions_from_post.delay(post.pk)
+
+            if post.image:
+                resize_thumbnails_update_post_image.delay(post.pk)
+
+    @receiver(post_save, sender=Post_Mentions)
+    def post_mention_saved(sender, **kwargs):
+        post = kwargs.get('instance').post
+        user = kwargs.get('instance').user
+        created = kwargs.get('created')
+
+        if post and user and created:
+            send_mail_from_post_to_user.delay(post.pk, user.username)
