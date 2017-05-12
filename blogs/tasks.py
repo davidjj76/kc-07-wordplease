@@ -5,6 +5,7 @@ import sys
 import time
 from PIL import Image
 from celery import shared_task
+from django.core.mail import send_mail
 
 from blogs.settings import MAX_IMAGE_WIDTH, THUMBNAIL_SIZES
 
@@ -57,10 +58,9 @@ def generate_mentions_from_post(post_id):
         print('Generating mentions from post {0}'.format(post_id))
         post = Post.objects.get(pk=post_id)
         for mention in post.get_mentions():
-            username = mention[1:]
-            possible_user = User.objects.filter(username=username)
-            if len(possible_user) == 1:
-                Post_Mentions(post=post, user=possible_user[0]).save()
+            mentioned_user = User.objects.filter(username=mention[1:])
+            if len(mentioned_user) == 1 and mentioned_user[0].username != post.blog.owner.username:
+                Post_Mentions(post=post, user=mentioned_user[0]).save()
 
     except Post.DoesNotExist:
         print('Post {0} does not exist'.format(post_id))
@@ -76,10 +76,16 @@ def send_mail_from_post_to_user(post_id, username):
 
     try:
         print('Sending mail to {0}, from post {1}'.format(username, post_id))
-        time.sleep(1)
-        print('Sent mail to {0}, from post {1}'.format(username, post_id))
         post = Post.objects.get(pk=post_id)
         user = User.objects.get(username=username)
+        send_mail(
+            post.title,
+            post.body,
+            'from@example.com',
+            [user.email],
+            fail_silently=False,
+        )
+        print('Sent mail to {0}, from post {1}'.format(username, post_id))
 
     except Post.DoesNotExist:
         print('Post {0} does not exist'.format(post_id))
