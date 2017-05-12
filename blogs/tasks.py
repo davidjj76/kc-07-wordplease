@@ -5,7 +5,6 @@ import sys
 import time
 from PIL import Image
 from celery import shared_task
-from django.core.mail import send_mail
 
 from blogs.settings import MAX_IMAGE_WIDTH, THUMBNAIL_SIZES
 
@@ -38,9 +37,10 @@ def resize_thumbnails_update_post_image(post_id):
                 post.get_image_extension()))
 
         post.image.name = new_image_name
-        post.save()
+        post.save(force_update=True)
 
         os.remove(original_image_path)
+        print('Optimized images for post {0}'.format(post_id))
 
     except Post.DoesNotExist:
         print('Post {0} does not exist'.format(post_id))
@@ -50,48 +50,19 @@ def resize_thumbnails_update_post_image(post_id):
 
 
 @shared_task
-def generate_mentions_from_post(post_id):
-    from blogs.models import Post, Post_Mentions
-    from django.contrib.auth.models import User
+def send_mail_from_post_to_user(post_mention_id):
+    from blogs.models import Post_Mentions
 
     try:
-        print('Generating mentions from post {0}'.format(post_id))
-        post = Post.objects.get(pk=post_id)
-        for mention in post.get_mentions():
-            mentioned_user = User.objects.filter(username=mention[1:])
-            if len(mentioned_user) == 1 and mentioned_user[0].username != post.blog.owner.username:
-                Post_Mentions(post=post, user=mentioned_user[0]).save()
+        post_mention = Post_Mentions.objects.get(pk=post_mention_id)
+        print('Sending mail to {0}, from post {1}'.format(post_mention.user.username, post_mention.post.pk))
+        post_mention.send_mail()
+        # Fake delay
+        time.sleep(2)
+        print('Sent mail to {0}, from post {1}'.format(post_mention.user.username, post_mention.post.pk))
 
-    except Post.DoesNotExist:
-        print('Post {0} does not exist'.format(post_id))
-
-    except:
-        print('Unexpected error:', sys.exc_info()[0])
-
-
-@shared_task
-def send_mail_from_post_to_user(post_id, username):
-    from blogs.models import Post, Post_Mentions
-    from django.contrib.auth.models import User
-
-    try:
-        print('Sending mail to {0}, from post {1}'.format(username, post_id))
-        post = Post.objects.get(pk=post_id)
-        user = User.objects.get(username=username)
-        send_mail(
-            post.title,
-            post.body,
-            'from@example.com',
-            [user.email],
-            fail_silently=False,
-        )
-        print('Sent mail to {0}, from post {1}'.format(username, post_id))
-
-    except Post.DoesNotExist:
-        print('Post {0} does not exist'.format(post_id))
-
-    except User.DoesNotExist:
-        print('User {0} does not exist'.format(username))
+    except Post_Mentions.DoesNotExist:
+        print('Post Mention {0} does not exist'.format(post_mention_id))
 
     except:
         print('Unexpected error:', sys.exc_info()[0])
