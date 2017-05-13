@@ -7,8 +7,8 @@ from blogs.models import Post, Category
 
 class PostForm(forms.ModelForm):
 
-    title = forms.CharField(label=_('Title'))
-    intro = forms.CharField(label=_('Intro'), widget=forms.Textarea)
+    title = forms.CharField(label=_('Title'), max_length=250)
+    intro = forms.CharField(label=_('Intro'), widget=forms.Textarea, max_length=250)
     body = forms.CharField(label=_('Body'), widget=forms.Textarea)
     image = forms.ImageField(label=_('Image'), required=False)
     publish_date = forms.DateTimeField(label=_('Publish date'), initial=now())

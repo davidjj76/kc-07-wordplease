@@ -8,7 +8,7 @@ fi
 echo "Installing and activating virtual environment..."
 virtualenv env
 source env/bin/activate
-pip install -r requirements.txt
+pip install -r requirements.txt --no-cache-dir
 
 if [ -e "db.sqlite3" ]; then
     echo "Removing database..."
@@ -26,6 +26,9 @@ python manage.py loaddata categories
 
 echo "Creating blogs..."
 python manage.py loaddata blogs
+
+echo "Creating posts..."
+python manage.py loaddata posts
 
 if [ -d "media" ]; then
     echo "Removing 'media' folder..."
