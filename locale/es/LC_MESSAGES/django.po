@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-05-06 22:32+0000\n"
+"POT-Creation-Date: 2017-05-13 20:02+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,6 +18,216 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: blogs/templates/blogs/latest_posts.html:9
-msgid "Welcome to wordplease"
-msgstr "Bienvenido a wordplease"
+#: blogs/forms.py:9
+msgid "Title"
+msgstr "Titulo"
+
+#: blogs/forms.py:10
+msgid "Intro"
+msgstr "Introducción"
+
+#: blogs/forms.py:11
+msgid "Body"
+msgstr "Texto completo"
+
+#: blogs/forms.py:12
+msgid "Image"
+msgstr "Imagen"
+
+#: blogs/forms.py:13
+msgid "Publish date"
+msgstr "Fecha de publicación"
+
+#: blogs/forms.py:14 blogs/templates/blogs/includes/categories_list.html:2
+msgid "Categories"
+msgstr "Categorias"
+
+#: blogs/templates/blogs/blog_list.html:6
+msgid "Wordplease's blogs"
+msgstr "Los blogs de Wordplease"
+
+#: blogs/templates/blogs/blog_list.html:8
+#: blogs/templates/blogs/latest_posts.html:8
+#, python-format
+msgid "(%(count)s and counting)"
+msgstr "(%(count)s y creciendo)"
+
+#: blogs/templates/blogs/blog_list.html:27
+msgid "by"
+msgstr "por"
+
+#: blogs/templates/blogs/blog_list.html:34
+msgid "No blogs here"
+msgstr "No hay blogs"
+
+#: blogs/templates/blogs/blog_list.html:35
+msgid "We are sorry, but nobody has a blog here."
+msgstr "Lo sentimos, pero no hay ningún blog por aquí"
+
+#: blogs/templates/blogs/includes/post_list.html:24
+msgid "No posts here"
+msgstr "No hay posts"
+
+#: blogs/templates/blogs/includes/post_list.html:25
+msgid "We are sorry, but nobody has published any post yet."
+msgstr "Lo sentimos, pero nadie ha publicado un post todavía."
+
+#: blogs/templates/blogs/latest_posts.html:6
+msgid "Latest posts"
+msgstr "Ultimos posts"
+
+#: blogs/templates/blogs/new_post.html:6
+msgid "Reply to "
+msgstr "Responder a "
+
+#: blogs/templates/blogs/new_post.html:8
+msgid "New post"
+msgstr "Nuevo post"
+
+#: blogs/templates/blogs/new_post.html:14
+msgid "Save new post"
+msgstr "Guardar el nuevo post"
+
+#: blogs/templates/blogs/post_detail.html:11
+msgid "Reply post"
+msgstr "Responder al post"
+
+#: blogs/templates/blogs/post_detail.html:19
+msgid "Published in"
+msgstr "Publicado en"
+
+#: blogs/templates/blogs/post_detail.html:21
+msgid "on"
+msgstr "el"
+
+#: users/forms.py:12
+msgid "The two password fields didn't match."
+msgstr "Los dos campos de contraseña no coinciden."
+
+#: users/forms.py:13
+msgid "Username already exists."
+msgstr "El nombre de usuario ya existe."
+
+#: users/forms.py:14
+msgid "Email already exists."
+msgstr "El correo electrónico ya existe."
+
+#: users/forms.py:17
+msgid "First name"
+msgstr "Nombre"
+
+#: users/forms.py:18
+msgid "Last name"
+msgstr "Apellidos"
+
+#: users/forms.py:19
+msgid "E-mail"
+msgstr "Correo electrónico"
+
+#: users/forms.py:21
+msgid "Username"
+msgstr "Nombre de usuario"
+
+#: users/forms.py:22 users/forms.py:25
+msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgstr "Requerido. Máximo de 30 caracteres. Sólo letras, números y @/./+/-/_"
+
+#: users/forms.py:28
+msgid "Password"
+msgstr "Contraseña"
+
+#: users/forms.py:30
+msgid "Password confirmation"
+msgstr "Confirma la contraseña"
+
+#: users/forms.py:32
+msgid "Enter the same password as above, for verification."
+msgstr "Repita la contraseña, para confirmarla."
+
+#: users/forms.py:33
+msgid "Blog name"
+msgstr "Nombre del blog"
+
+#: users/forms.py:34
+msgid "Blog description"
+msgstr "Descripción del blog"
+
+#: users/templates/users/login.html:6
+msgid "Login into Wordplease"
+msgstr "Entrar en Wordplease"
+
+#: users/templates/users/login.html:14 wordplease/templates/base.html:42
+msgid "Login"
+msgstr "Entrar"
+
+#: users/templates/users/profile.html:6 wordplease/templates/base.html:38
+msgid "My profile"
+msgstr "Mi perfil"
+
+#: users/templates/users/profile.html:14
+msgid "Update profile"
+msgstr "Actualizar perfil"
+
+#: users/templates/users/profile_updated.html:5
+msgid "Profile updated!"
+msgstr "Perfil actualizado"
+
+#: users/templates/users/profile_updated.html:6
+msgid "Your profile data has been updated successfully."
+msgstr "Sus datos de usuario han sido actualizados correctamente."
+
+#: users/templates/users/profile_updated.html:8
+msgid "Back to my profile"
+msgstr "Volver a mi perfil"
+
+#: users/templates/users/signup.html:6
+msgid "Signup into Wordplease"
+msgstr "Registrarse en Wordplease"
+
+#: users/templates/users/signup.html:14 wordplease/templates/base.html:41
+msgid "Signup"
+msgstr "Registrarse"
+
+#: users/templates/users/signup_successful.html:5
+msgid "Your welcome!"
+msgstr "¡Bienvenido!"
+
+#: users/templates/users/signup_successful.html:6
+msgid "Thank you to signup into Wordplease. "
+msgstr "Gracias por registrarse en Wordplease"
+
+#: users/templates/users/signup_successful.html:8
+msgid "Login now"
+msgstr "Entra ahora"
+
+#: wordplease/templates/base.html:8
+msgid "Wordplease: the politest blog platform"
+msgstr "Wordplease: la plataforma de blogs políticamente correctos"
+
+#: wordplease/templates/base.html:20
+msgid "Toggle navigation"
+msgstr "Cambiar navegación"
+
+#: wordplease/templates/base.html:25 wordplease/templates/base.html:59
+msgid "Wordplease"
+msgstr "Wordplease"
+
+#: wordplease/templates/base.html:29
+msgid "Home"
+msgstr "Inicio"
+
+#: wordplease/templates/base.html:30
+msgid "Blogs"
+msgstr "Blogs"
+
+#: wordplease/templates/base.html:35
+msgid "New Post"
+msgstr "Nuevo post"
+
+#: wordplease/templates/base.html:36
+msgid "My blog"
+msgstr "Mi blog"
+
+#: wordplease/templates/base.html:39
+msgid "Logout"
+msgstr "Salir"

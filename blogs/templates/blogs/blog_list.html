@@ -5,9 +5,7 @@
       <h1>
           {% trans "Wordplease's blogs" %}
           <small>
-              {% blocktrans with count=object_list|length %}
-                  ({{ count }} and counting)
-              {% endblocktrans %}
+              {% blocktrans with count=object_list|length %}({{ count }} and counting){% endblocktrans %}
           </small>
       </h1>
     </div>
@@ -26,7 +24,7 @@
                             {{ blog.description }}
                         </div>
                         <div class="panel-footer">
-                            by {{ blog.owner.first_name }} {{ blog.owner.last_name }}
+                            {% trans "by" %} {{ blog.owner.first_name }} {{ blog.owner.last_name }}
                         </div>
                     </div>
                 </a>

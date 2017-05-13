@@ -1,9 +1,18 @@
-from django.forms import ModelForm
+from django import forms
+from django.utils.timezone import now
+from django.utils.translation import ugettext_lazy as _
 
-from blogs.models import Post
+from blogs.models import Post, Category
 
 
-class PostForm(ModelForm):
+class PostForm(forms.ModelForm):
+
+    title = forms.CharField(label=_('Title'))
+    intro = forms.CharField(label=_('Intro'), widget=forms.Textarea)
+    body = forms.CharField(label=_('Body'), widget=forms.Textarea)
+    image = forms.ImageField(label=_('Image'), required=False)
+    publish_date = forms.DateTimeField(label=_('Publish date'), initial=now())
+    categories = forms.ModelMultipleChoiceField(label=_('Categories'), queryset=Category.objects.all())
 
     class Meta:
         model = Post
