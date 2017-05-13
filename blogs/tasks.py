@@ -26,6 +26,8 @@ def resize_thumbnails_update_post_image(post_id):
             new_height = int(MAX_IMAGE_WIDTH * height / width)
             new_img = img.resize((MAX_IMAGE_WIDTH, new_height))
             new_img.save(new_image_path)
+        else:
+            img.save(new_image_path)
 
         for size in THUMBNAIL_SIZES:
             tn_img = img.copy()
