@@ -3,7 +3,15 @@
 {% load l10n %}
 {% block section %}
     {% include "blogs/includes/blog_header.html" %}
-    <h1>{{ object.title }}</h1>
+    <div class="post-detail-title">
+        <h1>{{ object.title }}</h1>
+        {% if user.is_authenticated %}
+            <a class="btn btn-warning"
+               href="{% url 'post_reply' object.blog.owner.username object.pk %}"
+               title="Reply">{% trans "Reply post" %}
+            </a>
+        {% endif %}
+    </div>
     {% if object.image %}
         <img class="thumbnail img-responsive" src="{{ object.image.url }}" alt="{{ object.title }}">
     {% endif %}

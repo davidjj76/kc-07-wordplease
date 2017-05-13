@@ -50,19 +50,24 @@ def resize_thumbnails_update_post_image(post_id):
 
 
 @shared_task
-def send_mail_from_post_to_user(post_mention_id):
-    from blogs.models import Post_Mentions
+def send_mail_from_post_to_user(post_id, username, is_reply=False):
+    from blogs.models import Post
+    from django.contrib.auth.models import User
 
     try:
-        post_mention = Post_Mentions.objects.get(pk=post_mention_id)
-        print('Sending mail to {0}, from post {1}'.format(post_mention.user.username, post_mention.post.pk))
-        post_mention.send_mail()
+        post = Post.objects.get(pk=post_id)
+        user = User.objects.get(username=username)
+        print('Sending mail to {0}, from post {1}'.format(username, post_id))
+        post.send_mail_to_user(user, is_reply)
         # Fake delay
         time.sleep(2)
-        print('Sent mail to {0}, from post {1}'.format(post_mention.user.username, post_mention.post.pk))
+        print('Sent mail to {0}, from post {1}'.format(username, post_id))
 
-    except Post_Mentions.DoesNotExist:
-        print('Post Mention {0} does not exist'.format(post_mention_id))
+    except Post.DoesNotExist:
+        print('Post {0} does not exist'.format(post_id))
+
+    except User.DoesNotExist:
+        print('User {0} does not exist'.format(username))
 
     except:
         print('Unexpected error:', sys.exc_info()[0])

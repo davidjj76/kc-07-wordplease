@@ -109,3 +109,20 @@ class NewPost(LoginRequiredMixin, UserPassesTestMixin, CreateView):
             return reverse('users_profile')
         else:
             return reverse('users_login')
+
+
+class PostReply(NewPost):
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'replied_post': get_object_or_404(Post, pk=self.kwargs.get('pk'))
+        })
+        return context
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        if self.request.method == 'POST':
+            form.instance.reply_to = get_object_or_404(Post, pk=self.kwargs.get('pk'))
+        return form
+

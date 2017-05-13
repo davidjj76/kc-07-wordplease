@@ -2,7 +2,11 @@
 {% load i18n %}
 {% block section %}
     <div class="page-header">
-        <h1>{% trans "New post" %}</h1>
+        {% if replied_post %}
+        <h1>{% trans "Reply to " %}<em>{{ replied_post.title }}</em></h1>
+        {% else %}
+            <h1>{% trans "New post" %}</h1>
+        {% endif %}
     </div>
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}

@@ -60,6 +60,11 @@ class Post(models.Model):
         through='Post_Mentions',
         through_fields=('post', 'user')
     )
+    reply_to = models.ForeignKey(
+        'self',
+        blank=True,
+        null=True
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     modified_at = models.DateTimeField(auto_now=True)
     objects = PostManager()
@@ -101,7 +106,34 @@ class Post(models.Model):
         for mention in self.get_mentions():
             mentioned_user = User.objects.filter(username=mention[1:])
             if len(mentioned_user) == 1 and mentioned_user[0].username != self.blog.owner.username:
-                Post_Mentions(post=self, user=mentioned_user[0]).save()
+                post_mention = Post_Mentions(post=self, user=mentioned_user[0])
+                post_mention.save()
+
+    def send_mail_to_user(self, user, is_reply):
+        if is_reply:
+            subject = '{0} has replied your post {1}'.format(self.blog.owner.username, self.reply_to.title)
+        else:
+            subject = '{0} has mentioned you in a new post'.format(self.blog.owner.username)
+
+        send_mail(
+            subject,
+            self.title + '\n' +
+            self.intro + '\n' +
+            'See more on {0}'.format(self.get_url()),
+            self.blog.owner.email,
+            [user.email]
+        )
+
+        # if is_reply:
+            # Guardar en replica
+            # replied_post = self.reply_to
+            # replied_post.mail_sent_at = now()
+            # replied_post.save()
+        # if not is_reply:
+        #     # Guardar en menciones
+        #     post_mention = Post_Mentions.objects.get(post=self, user=user)
+        #     post_mention.mail_sent_at = now()
+        #     post_mention.save()
 
 
 class Post_Mentions(models.Model):
@@ -109,30 +141,30 @@ class Post_Mentions(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     mail_sent_at = models.DateTimeField(null=True)
 
-    def send_mail(self):
-        # Send mail from post owner to mentioned user
-        send_mail(
-            '{0} has mentioned you in a new post'.format(self.post.blog.owner.username),
-            self.post.title + '\n' +
-            self.post.intro + '\n' +
-            'See more on {0}'.format(self.post.get_url()),
-            self.post.blog.owner.email,
-            [self.user.email]
-        )
-        self.mail_sent_at = now()
-        self.save()
+
+# class Post_Replies(models.Model):
+#     post = models.OneToOneField(Post, on_delete=models.CASCADE, related_name='post_replies')
+#     reply_to = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='replied_post')
+#     mail_sent_at = models.DateTimeField(null=True)
 
 
 if settings.USE_CELERY and 'test' not in sys.argv and 'migrate' not in sys.argv:
-
 
     @receiver(post_save, sender=Post)
     def post_saved(sender, **kwargs):
         post = kwargs.get('instance')
         created = kwargs.get('created')
 
-        if post and post.image and created:
-            resize_thumbnails_update_post_image.delay(post.pk)
+        if created and post:
+            if post.image:
+                resize_thumbnails_update_post_image.delay(post.pk)
+
+            if post.reply_to and post.blog.owner.username != post.reply_to.blog.owner.username:
+                send_mail_from_post_to_user.delay(
+                    post.pk,
+                    post.reply_to.blog.owner.username,
+                    True
+                )
 
 
     @receiver(post_save, sender=Post_Mentions)
@@ -140,5 +172,8 @@ if settings.USE_CELERY and 'test' not in sys.argv and 'migrate' not in sys.argv:
         post_mention = kwargs.get('instance')
         created = kwargs.get('created')
 
-        if post_mention and created:
-            send_mail_from_post_to_user.delay(post_mention.id)
+        if created and post_mention:
+            send_mail_from_post_to_user.delay(
+                post_mention.post.pk,
+                post_mention.user.username
+            )
