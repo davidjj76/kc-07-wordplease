@@ -123,6 +123,5 @@ class PostReply(NewPost):
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
         if self.request.method == 'POST':
-            form.instance.reply_to = get_object_or_404(Post, pk=self.kwargs.get('pk'))
+            form.instance.reply_to = Post.objects.get(pk=self.kwargs.get('pk'))
         return form
-

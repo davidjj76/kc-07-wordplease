@@ -52,24 +52,21 @@ def resize_thumbnails_update_post_image(post_id):
 
 
 @shared_task
-def send_mail_from_post_to_user(post_id, username, is_reply=False):
-    from blogs.models import Post
-    from django.contrib.auth.models import User
+def send_mail_notification(notification_id):
+    from blogs.models import Notification
 
     try:
-        post = Post.objects.get(pk=post_id)
-        user = User.objects.get(username=username)
+        notification = Notification.objects.get(pk=notification_id)
+        post_id = notification.post.pk
+        username = notification.receiver.username
         print('Sending mail to {0}, from post {1}'.format(username, post_id))
-        post.send_mail_to_user(user, is_reply)
+        notification.send_mail()
         # Fake delay
         time.sleep(2)
         print('Sent mail to {0}, from post {1}'.format(username, post_id))
 
-    except Post.DoesNotExist:
-        print('Post {0} does not exist'.format(post_id))
-
-    except User.DoesNotExist:
-        print('User {0} does not exist'.format(username))
+    except Notification.DoesNotExist:
+        print('Notification {0} does not exist'.format(notification_id))
 
     except:
         print('Unexpected error:', sys.exc_info()[0])

@@ -11,7 +11,7 @@ from django.utils import timezone
 from django.utils.timezone import now
 
 from wordplease import settings
-from .tasks import resize_thumbnails_update_post_image, send_mail_from_post_to_user
+from .tasks import resize_thumbnails_update_post_image, send_mail_notification
 
 
 class Category(models.Model):
@@ -54,12 +54,6 @@ class Post(models.Model):
     image = models.ImageField(blank=True, null=True, upload_to='blogs/images')
     publish_date = models.DateTimeField(default=timezone.now)
     categories = models.ManyToManyField(Category, related_name='posts')
-    mentions = models.ManyToManyField(
-        User,
-        related_name='mentions',
-        through='Post_Mentions',
-        through_fields=('post', 'user')
-    )
     reply_to = models.ForeignKey(
         'self',
         blank=True,
@@ -100,52 +94,56 @@ class Post(models.Model):
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         super().save(force_insert, force_update, using, update_fields)
         if not force_update:
-            self.save_mentions()
+            self.create_notifications()
 
-    def save_mentions(self):
+    def create_notifications(self):
+        replied_user = self.reply_to.blog.owner if self.reply_to else None
+
+        # Notificaciones por respuesta
+        # Hay un usuario replicado y es distinto al autor del post
+        if replied_user and replied_user.id != self.blog.owner.id:
+            self.notifications.create(
+                post=self,
+                receiver=replied_user
+            )
+
+        # Notificaciones por mención
         for mention in self.get_mentions():
             mentioned_user = User.objects.filter(username=mention[1:])
-            if len(mentioned_user) == 1 and mentioned_user[0].username != self.blog.owner.username:
-                post_mention = Post_Mentions(post=self, user=mentioned_user[0])
-                post_mention.save()
+            # La mención corresponde a un usuario real, que no es el autor del post ni el usuario replicado
+            if len(mentioned_user) == 1 and mentioned_user[0].id != self.blog.owner.id:
+                if not replied_user or replied_user.id != mentioned_user[0].id:
+                    self.notifications.create(
+                        post=self,
+                        receiver=mentioned_user[0]
+                    )
 
-    def send_mail_to_user(self, user, is_reply):
-        if is_reply:
-            subject = '{0} has replied your post {1}'.format(self.blog.owner.username, self.reply_to.title)
+
+class Notification(models.Model):
+    post = models.ForeignKey(Post, related_name='notifications')
+    receiver = models.ForeignKey(User, related_name='notifications')
+    mail_sent_at = models.DateTimeField(null=True)
+
+    def send_mail(self):
+        post = self.post
+        receiver = self.receiver
+        if post.reply_to and receiver.id == post.reply_to.blog.owner.id:
+            subject = '{0} has replied your post {1}'.format(post.blog.owner.username, post.reply_to.title)
         else:
-            subject = '{0} has mentioned you in a new post'.format(self.blog.owner.username)
+            subject = '{0} has mentioned you in a new post'.format(post.blog.owner.username)
 
         send_mail(
             subject,
-            self.title + '\n' +
-            self.intro + '\n' +
-            'See more on {0}'.format(self.get_url()),
-            self.blog.owner.email,
-            [user.email]
+            post.title + '\n' +
+            post.intro + '\n' +
+            'Read more on {0}'.format(post.get_url()),
+            post.blog.owner.email,
+            [receiver.email]
         )
 
-        # if is_reply:
-            # Guardar en replica
-            # replied_post = self.reply_to
-            # replied_post.mail_sent_at = now()
-            # replied_post.save()
-        # if not is_reply:
-        #     # Guardar en menciones
-        #     post_mention = Post_Mentions.objects.get(post=self, user=user)
-        #     post_mention.mail_sent_at = now()
-        #     post_mention.save()
+        self.mail_sent_at = now()
+        self.save()
 
-
-class Post_Mentions(models.Model):
-    post = models.ForeignKey(Post, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    mail_sent_at = models.DateTimeField(null=True)
-
-
-# class Post_Replies(models.Model):
-#     post = models.OneToOneField(Post, on_delete=models.CASCADE, related_name='post_replies')
-#     reply_to = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='replied_post')
-#     mail_sent_at = models.DateTimeField(null=True)
 
 
 if settings.USE_CELERY and 'test' not in sys.argv and 'migrate' not in sys.argv:
@@ -159,21 +157,11 @@ if settings.USE_CELERY and 'test' not in sys.argv and 'migrate' not in sys.argv:
             if post.image:
                 resize_thumbnails_update_post_image.delay(post.pk)
 
-            if post.reply_to and post.blog.owner.username != post.reply_to.blog.owner.username:
-                send_mail_from_post_to_user.delay(
-                    post.pk,
-                    post.reply_to.blog.owner.username,
-                    True
-                )
 
-
-    @receiver(post_save, sender=Post_Mentions)
-    def post_mention_saved(sender, **kwargs):
-        post_mention = kwargs.get('instance')
+    @receiver(post_save, sender=Notification)
+    def notification_saved(sender, **kwargs):
+        notification = kwargs.get('instance')
         created = kwargs.get('created')
 
-        if created and post_mention:
-            send_mail_from_post_to_user.delay(
-                post_mention.post.pk,
-                post_mention.user.username
-            )
+        if created and notification:
+            send_mail_notification.delay(notification.pk)
