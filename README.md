@@ -61,7 +61,8 @@ El message broker utilizado es *rabbitmq*, por lo que tendrás que tener un serv
 ***
 #### TODO ####
 
-1. Implementar las API para gestionar usuarios y posts, aunque la existencia de un API no cambiaría la solución a las tareas de background, ya que estas se gestionan directamente desde el modelo.
+1. Implementar por completo las API para gestionar usuarios y posts.
+Sólo he implementado una versión rápida para poder crear posts y replicas a posts, y así poder comprobar que las tareas en background siguen funcionando.
 
 2. Implementar tests.
 
