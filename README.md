@@ -62,7 +62,14 @@ El message broker utilizado es *rabbitmq*, por lo que tendrás que tener un serv
 #### TODO ####
 
 1. Implementar por completo las API para gestionar usuarios y posts.
-Sólo he implementado una versión rápida para poder crear posts y replicas a posts, y así poder comprobar que las tareas en background siguen funcionando.
+Sólo he implementado una versión rápida para poder crear posts y replicas a posts, y así poder comprobar que las tareas en background siguen funcionando (optimización de imágenes y envío de notificaciones por réplica y mención).
+
+De momento, están disponibles los endpoint:
+
+```
+1. /api/1.0/posts -> Listar los posts y crear uno nuevo
+2. /api/1.0/posts/<pk>/reply -> Crear un post replicando al post con id=pk
+```
 
 2. Implementar tests.
 
