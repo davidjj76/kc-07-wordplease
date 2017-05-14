@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'users.apps.UsersConfig',
     'django_extensions',
     'django_filters',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
